@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
-    Page<Supplier> findAll(Pageable pageable);
+public interface SupplierRepo extends JpaRepository<Supplier, UUID> {
+    Page<Supplier> findAllBy(Pageable pageable);
 }
