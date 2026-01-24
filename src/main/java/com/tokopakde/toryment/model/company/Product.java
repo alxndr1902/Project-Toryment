@@ -1,9 +1,7 @@
 package com.tokopakde.toryment.model.company;
 
 import com.tokopakde.toryment.model.BaseModel;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,4 +18,8 @@ public class Product extends BaseModel {
 
     @Column(nullable = false)
     private Integer stock;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 }
