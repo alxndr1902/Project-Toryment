@@ -75,4 +75,12 @@ public class ErrorHandler {
 
         return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
     }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<?> handleInsufficientStockException(InsufficientStockException e) {
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        var errorMessage = e.getMessage();
+
+        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
+    }
 }
