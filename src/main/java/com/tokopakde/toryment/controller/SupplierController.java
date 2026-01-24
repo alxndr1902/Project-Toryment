@@ -21,14 +21,14 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/suppliers")
+@RequestMapping("suppliers")
 public class SupplierController {
     private final SupplierService supplierService;
 
     @GetMapping
-    public ResponseEntity<Page<SupplierResDTO>> getSuppliers(@RequestParam(defaultValue = "0") Integer Page,
+    public ResponseEntity<Page<SupplierResDTO>> getSuppliers(@RequestParam(defaultValue = "0") Integer page,
                                                              @RequestParam(defaultValue = "5") Integer size) {
-        Pageable pageable = PageRequest.of(Page, size, Sort.by(Sort.Direction.DESC, "name"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "name"));
         Page<SupplierResDTO> res = supplierService.getSuppliers(pageable);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
