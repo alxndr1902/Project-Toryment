@@ -6,6 +6,9 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.supplier.CreateSupplierReqDTO;
 import com.tokopakde.toryment.dto.supplier.SupplierResDTO;
 import com.tokopakde.toryment.dto.supplier.UpdateSupplierReqDTO;
+import com.tokopakde.toryment.model.company.Supplier;
+import com.tokopakde.toryment.pagination.PageMapper;
+import com.tokopakde.toryment.pagination.PageResponse;
 import com.tokopakde.toryment.service.SupplierService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +29,10 @@ public class SupplierController {
     private final SupplierService supplierService;
 
     @GetMapping
-    public ResponseEntity<Page<SupplierResDTO>> getSuppliers(@RequestParam(defaultValue = "0") Integer page,
-                                                             @RequestParam(defaultValue = "5") Integer size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "name"));
-        Page<SupplierResDTO> res = supplierService.getSuppliers(pageable);
-        return new ResponseEntity<>(res, HttpStatus.OK);
+    public PageResponse<SupplierResDTO> getSuppliers(Pageable pageable) {
+        Page<Supplier> page = supplierService.getSuppliers(pageable);
+
+        return PageMapper.toPageResponse(page, SupplierResDTO::fromEntity);
     }
 
     @GetMapping("{id}")

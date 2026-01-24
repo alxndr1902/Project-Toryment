@@ -23,9 +23,9 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
     private final SupplierRepo supplierRepository;
 
     @Override
-    public Page<SupplierResDTO> getSuppliers(Pageable pageable) {
-        Page<SupplierResDTO> dtos = supplierRepository.findAllBy(pageable).map(this::mapToDto);
-        return dtos;
+    public Page<Supplier> getSuppliers(Pageable pageable) {
+        Page<Supplier> suppliers = supplierRepository.findAllBy(pageable);
+        return suppliers;
     }
 
     @Override
