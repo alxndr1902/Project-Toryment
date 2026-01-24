@@ -9,7 +9,7 @@ import com.tokopakde.toryment.dto.supplier.SupplierResDTO;
 import com.tokopakde.toryment.dto.supplier.UpdateSupplierReqDTO;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.model.company.Supplier;
-import com.tokopakde.toryment.repository.SupplierRepository;
+import com.tokopakde.toryment.repository.SupplierRepo;
 import com.tokopakde.toryment.service.BaseService;
 import com.tokopakde.toryment.service.SupplierService;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +20,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SupplierServiceImpl extends BaseService implements SupplierService {
-    private final SupplierRepository supplierRepository;
+    private final SupplierRepo supplierRepository;
 
     @Override
     public Page<SupplierResDTO> getSuppliers(Pageable pageable) {
-        Page<SupplierResDTO> dtos = supplierRepository.findAll(pageable).map(this::mapToDto);
+        Page<SupplierResDTO> dtos = supplierRepository.findAllBy(pageable).map(this::mapToDto);
         return dtos;
     }
 
@@ -47,7 +47,7 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
         supplier.setName(request.getName());
         supplier.setPhoneNumber(request.getPhoneNumber());
         var savedSupplier = supplierRepository.save(prepareCreate(supplier));
-        return new  CreateResDTO(savedSupplier.getId(), Message.CREATED.getName());
+        return new  CreateResDTO(savedSupplier.getId(), Message.CREATED.getDescription());
     }
 
     @Override
@@ -57,14 +57,14 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
         supplier.setPhoneNumber(request.getPhoneNumber());
 
         var updatedSupplier = supplierRepository.saveAndFlush(prepareUpdate(supplier));
-        return new UpdateResDTO(updatedSupplier.getVersion(),  Message.UPDATED.getName());
+        return new UpdateResDTO(updatedSupplier.getVersion(),  Message.UPDATED.getDescription());
     }
 
     @Override
     public CommonResDTO deleteSupplier(String id) {
         var supplier =  findSupplierById(id);
         supplierRepository.delete(supplier);
-        return new  CommonResDTO(Message.DELETED.getName());
+        return new  CommonResDTO(Message.DELETED.getDescription());
     }
 
     private Supplier findSupplierById(String id) {
