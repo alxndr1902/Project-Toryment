@@ -1,0 +1,96 @@
+package com.tokopakde.toryment.service.impl;
+
+import com.tokopakde.toryment.constant.Message;
+import com.tokopakde.toryment.dto.CommonResDTO;
+import com.tokopakde.toryment.dto.CreateResDTO;
+import com.tokopakde.toryment.dto.UpdateResDTO;
+import com.tokopakde.toryment.dto.branch.BranchResDTO;
+import com.tokopakde.toryment.dto.branch.CreateBranchReqDTO;
+import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
+import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
+import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
+import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
+import com.tokopakde.toryment.mapper.BranchMapper;
+import com.tokopakde.toryment.model.company.Branch;
+import com.tokopakde.toryment.repository.BranchRepo;
+import com.tokopakde.toryment.service.BaseService;
+import com.tokopakde.toryment.service.BranchService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@RequiredArgsConstructor
+@Service
+public class BranchServiceImpl extends BaseService implements BranchService {
+    private final BranchRepo branchRepo;
+    private final BranchMapper branchMapper;
+
+    @Override
+    public Page<BranchResDTO> getBranches(Pageable pageable) {
+        return branchRepo.findAllBy(pageable).map(branchMapper::mapToDto);
+    }
+
+    @Override
+    public BranchResDTO getBranchById(String id) {
+        var branch = findBranchById(id);
+        return branchMapper.mapToDto(branch);
+    }
+
+    @Override
+    public CreateResDTO createBranch(CreateBranchReqDTO request) {
+        if (branchRepo.existsByCode(request.getCode())) {
+            throw new DuplicateException("Code Is Not Available");
+        }
+
+        if (branchRepo.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new DuplicateException("Phone Number Is Not Available");
+        }
+
+        var branch = branchMapper.mapToEntity(request);
+        var savedBranch = branchRepo.save(prepareCreate(branch));
+        return new CreateResDTO(savedBranch.getId(), Message.CREATED.getDescription());
+    }
+
+    @Override
+    public UpdateResDTO updateBranch(String id, UpdateBranchReqDTO request) {
+        var branch = findBranchById(id);
+
+        if (!branch.getVersion().equals(request.getVersion())) {
+            throw new DataIntegrationException("Error Updating Branch, Please Refresh The Page");
+        }
+
+        if (!branch.getCode().equals(request.getCode())) {
+            branchRepo.findByCode(request.getCode())
+                    .ifPresent(existingBranch -> {
+                        throw new DuplicateException("Code Is Not Available");
+                    });
+        }
+
+        if (!branch.getPhoneNumber().equals(request.getPhoneNumber())) {
+            branchRepo.findByPhoneNumber(request.getPhoneNumber())
+                    .ifPresent(existingBranch -> {
+                        throw new DuplicateException("Phone Number Is Not Available");
+                    });
+        }
+
+        branch = branchMapper.updateEntity(request);
+        var updatedBranch = branchRepo.saveAndFlush(branch);
+        return new UpdateResDTO(updatedBranch.getVersion(), Message.UPDATED.getDescription());
+    }
+
+    @Override
+    public CommonResDTO deleteBranch(String id) {
+        var branch = findBranchById(id);
+        branchRepo.delete(branch);
+        return new CommonResDTO(Message.DELETED.getDescription());
+    }
+
+    private Branch findBranchById(String id) {
+        UUID branchId = convertToUUID(id);
+        return branchRepo.findById(branchId)
+                .orElseThrow(() -> new NotFoundException("Branch Not Found"));
+    }
+}
