@@ -8,6 +8,7 @@ import lombok.Data;
 public class CreateBranchReqDTO {
     @NotBlank(message = "Branch Code Is Required")
     @Size(max = 20, message = "Branch Code Maximum Length Is 20 Characters")
+    private String code;
 
     @NotBlank(message = "Branch Name Is Required")
     @Size(max = 100, message = "Branch Name Maximum Length Is 100 Characters")
