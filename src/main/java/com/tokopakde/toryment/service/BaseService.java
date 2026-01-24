@@ -14,8 +14,19 @@ public class BaseService {
         return model;
     }
 
+    protected <T extends BaseModel> T prepareCreate(T model, LocalDateTime now) {
+        model.setId(UUID.randomUUID());
+        model.setCreatedAt(now);
+        return model;
+    }
+
     protected <T extends BaseModel> T prepareUpdate(T model) {
         model.setUpdatedAt(LocalDateTime.now());
+        return model;
+    }
+
+    protected <T extends BaseModel> T prepareUpdate(T model, LocalDateTime now) {
+        model.setUpdatedAt(now);
         return model;
     }
 
