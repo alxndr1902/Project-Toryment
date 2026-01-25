@@ -15,7 +15,7 @@ public class ResupplyDetail extends BaseModel {
     @JoinColumn(name = "resupply_id", nullable = false)
     private Resupply resupply;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
