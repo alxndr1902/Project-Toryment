@@ -15,7 +15,7 @@ public class CheckoutDetail extends BaseModel {
     @JoinColumn(name = "checkout_id", nullable = false)
     private Checkout checkout;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
