@@ -12,7 +12,4 @@ public interface CategoryMapper {
     CategoryResDTO mapToDto(Category category);
 
     Category mapToEntity(CreateCategoryReqDTO dto);
-
-    @Mapping(target = "version", ignore = true)
-    Category updateEntity(UpdateCategoryReqDTO dto);
 }

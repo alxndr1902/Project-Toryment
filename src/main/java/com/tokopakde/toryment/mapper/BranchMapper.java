@@ -12,7 +12,4 @@ public interface BranchMapper {
     BranchResDTO mapToDto(Branch branch);
 
     Branch mapToEntity(CreateBranchReqDTO dto);
-
-    @Mapping(target = "version", ignore = true)
-    Branch updateEntity(UpdateBranchReqDTO dto);
 }
