@@ -1,15 +1,15 @@
-package com.tokopakde.toryment.pagination;
+package com.tokopakde.toryment.dto.pagination;
 
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class PageResponse<T> {
+public class PageResDTO<T> {
     private List<T> data;
     private PageMeta meta;
 
-    public PageResponse(List<T> data, PageMeta meta) {
+    public PageResDTO(List<T> data, PageMeta meta) {
         this.data = data;
         this.meta = meta;
     }

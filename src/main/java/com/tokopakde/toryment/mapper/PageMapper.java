@@ -1,14 +1,16 @@
-package com.tokopakde.toryment.pagination;
+package com.tokopakde.toryment.mapper;
 
+import com.tokopakde.toryment.dto.pagination.PageMeta;
+import com.tokopakde.toryment.dto.pagination.PageResDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.function.Function;
 
-public final class PageMapper {
-    private PageMapper() {} // prevent instantiation
-
-    public static <T, R> PageResponse<R> toPageResponse(Page<T> page, Function<T, R> mapper) {
+@Component
+public class PageMapper {
+    public <T, R> PageResDTO<R> toPageResponse(Page<T> page, Function<T, R> mapper) {
         List<R> data = page.getContent()
                 .stream()
                 .map(mapper)
@@ -23,6 +25,6 @@ public final class PageMapper {
                 page.hasPrevious()
         );
 
-        return new PageResponse<>(data, meta);
+        return new PageResDTO<>(data, meta);
     }
 }

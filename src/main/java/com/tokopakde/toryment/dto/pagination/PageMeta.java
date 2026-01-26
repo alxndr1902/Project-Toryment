@@ -1,4 +1,4 @@
-package com.tokopakde.toryment.pagination;
+package com.tokopakde.toryment.dto.pagination;
 
 import lombok.Getter;
 

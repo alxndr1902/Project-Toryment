@@ -6,21 +6,16 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.supplier.CreateSupplierReqDTO;
 import com.tokopakde.toryment.dto.supplier.SupplierResDTO;
 import com.tokopakde.toryment.dto.supplier.UpdateSupplierReqDTO;
-import com.tokopakde.toryment.model.company.Supplier;
-import com.tokopakde.toryment.pagination.PageMapper;
-import com.tokopakde.toryment.pagination.PageResponse;
+import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.service.SupplierService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,10 +24,11 @@ public class SupplierController {
     private final SupplierService supplierService;
 
     @GetMapping
-    public PageResponse<SupplierResDTO> getSuppliers(Pageable pageable) {
-        Page<Supplier> page = supplierService.getSuppliers(pageable);
-
-        return PageMapper.toPageResponse(page, SupplierResDTO::fromEntity);
+    public ResponseEntity<PageRes<SupplierResDTO>> getSuppliers(@RequestParam(defaultValue = "0") Integer page,
+                                                                @RequestParam(defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        PageRes<SupplierResDTO> pages = supplierService.getSuppliers(pageable);
+        return new ResponseEntity<>(pages, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
