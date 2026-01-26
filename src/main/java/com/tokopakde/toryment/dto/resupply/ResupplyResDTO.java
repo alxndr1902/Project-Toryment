@@ -10,8 +10,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ResupplyResDTO {
     private final UUID id;
-    private final String code;
     private final LocalDateTime dateTime;
+    private final String code;
     private final String supplierName;
     private final Integer version;
 }

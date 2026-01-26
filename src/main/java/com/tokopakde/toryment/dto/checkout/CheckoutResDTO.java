@@ -11,6 +11,7 @@ import java.util.UUID;
 public class CheckoutResDTO {
     private final UUID id;
     private final LocalDateTime dateTime;
-    private final String branchCode;
+    private final String code;
+    private final String branchName;
     private final Integer version;
 }

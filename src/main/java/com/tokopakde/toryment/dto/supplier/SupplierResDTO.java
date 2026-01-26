@@ -1,6 +1,5 @@
 package com.tokopakde.toryment.dto.supplier;
 
-import com.tokopakde.toryment.model.company.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,9 +12,4 @@ public class SupplierResDTO {
     private String name;
     private String phoneNumber;
     private Integer version;
-    
-    public static SupplierResDTO fromEntity(Supplier supplier) {
-        return new SupplierResDTO(supplier.getId(), supplier.getName(),
-                supplier.getPhoneNumber(), supplier.getVersion());
-    }
 }

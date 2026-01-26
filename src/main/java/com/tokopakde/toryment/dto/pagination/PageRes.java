@@ -5,11 +5,11 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class PageResDTO<T> {
+public class PageRes<T> {
     private List<T> data;
     private PageMeta meta;
 
-    public PageResDTO(List<T> data, PageMeta meta) {
+    public PageRes(List<T> data, PageMeta meta) {
         this.data = data;
         this.meta = meta;
     }

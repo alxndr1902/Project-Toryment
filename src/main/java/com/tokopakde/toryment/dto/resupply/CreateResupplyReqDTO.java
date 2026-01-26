@@ -1,6 +1,7 @@
 package com.tokopakde.toryment.dto.resupply;
 
 import com.tokopakde.toryment.dto.ProductQuantityDTO;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -15,5 +16,5 @@ public class CreateResupplyReqDTO {
     private String supplierId;
 
     @NotEmpty(message = "Products Are Required")
-    private List<ProductQuantityDTO> products;
+    private List<@Valid ProductQuantityDTO> products;
 }
