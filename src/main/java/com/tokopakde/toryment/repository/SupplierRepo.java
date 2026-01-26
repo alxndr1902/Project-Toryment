@@ -9,4 +9,8 @@ import java.util.UUID;
 
 public interface SupplierRepo extends JpaRepository<Supplier, UUID> {
     Page<Supplier> findAllBy(Pageable pageable);
+
+    boolean existsByName(String name);
+
+    boolean existsByPhoneNumber(String phoneNumber);
 }
