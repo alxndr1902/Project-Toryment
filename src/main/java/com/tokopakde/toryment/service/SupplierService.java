@@ -6,12 +6,11 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.supplier.CreateSupplierReqDTO;
 import com.tokopakde.toryment.dto.supplier.SupplierResDTO;
 import com.tokopakde.toryment.dto.supplier.UpdateSupplierReqDTO;
-import com.tokopakde.toryment.model.company.Supplier;
-import org.springframework.data.domain.Page;
+import com.tokopakde.toryment.dto.pagination.PageRes;
 import org.springframework.data.domain.Pageable;
 
 public interface SupplierService {
-    Page<Supplier> getSuppliers(Pageable pageable);
+    PageRes<SupplierResDTO> getSuppliers(Pageable pageable);
 
     SupplierResDTO getSupplierById(String id);
 

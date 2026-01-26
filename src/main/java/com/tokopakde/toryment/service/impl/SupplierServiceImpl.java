@@ -7,8 +7,12 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.supplier.CreateSupplierReqDTO;
 import com.tokopakde.toryment.dto.supplier.SupplierResDTO;
 import com.tokopakde.toryment.dto.supplier.UpdateSupplierReqDTO;
+import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
+import com.tokopakde.toryment.mapper.SupplierMapper;
 import com.tokopakde.toryment.model.company.Supplier;
+import com.tokopakde.toryment.mapper.PageMapper;
+import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.repository.SupplierRepo;
 import com.tokopakde.toryment.service.BaseService;
 import com.tokopakde.toryment.service.SupplierService;
@@ -21,11 +25,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SupplierServiceImpl extends BaseService implements SupplierService {
     private final SupplierRepo supplierRepository;
+    private final SupplierMapper supplierMapper;
+    private final PageMapper pageMapper;
 
     @Override
-    public Page<Supplier> getSuppliers(Pageable pageable) {
+    public PageRes<SupplierResDTO> getSuppliers(Pageable pageable) {
         Page<Supplier> suppliers = supplierRepository.findAllBy(pageable);
-        return suppliers;
+        PageRes<SupplierResDTO> pages = pageMapper.toPageResponse(suppliers, supplierMapper::fromEntity);
+        return pages;
     }
 
     @Override
@@ -43,6 +50,14 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
 
     @Override
     public CreateResDTO createSupplier(CreateSupplierReqDTO request) {
+        if (supplierRepository.existsByName(request.getName())) {
+            throw new DuplicateException("Name Is Not Available");
+        }
+
+        if (supplierRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new DuplicateException("Phone Number Is Not Available");
+        }
+
         var supplier = new Supplier();
         supplier.setName(request.getName());
         supplier.setPhoneNumber(request.getPhoneNumber());
@@ -53,6 +68,21 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
     @Override
     public UpdateResDTO updateSupplier(String id, UpdateSupplierReqDTO request) {
         var supplier = findSupplierById(id);
+        if (!supplier.getVersion().equals(request.getVersion())) {
+            throw new DuplicateException("Error Updating Supplier, Please Refresh The Page");
+        }
+
+        if (!supplier.getName().equals(request.getName())) {
+            if (supplierRepository.existsByName(request.getName())) {
+                throw new DuplicateException("Name Is Not Available");
+            }
+        }
+
+        if (!supplier.getPhoneNumber().equals(request.getPhoneNumber())) {
+            if (supplierRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+                throw new DuplicateException("Phone Number Is Not Available");
+            }
+        }
         supplier.setName(request.getName());
         supplier.setPhoneNumber(request.getPhoneNumber());
 
@@ -68,7 +98,7 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
     }
 
     private Supplier findSupplierById(String id) {
-        var supplierId = convertToUUID(id);
+        var supplierId = parseUUID(id);
         var supplier = supplierRepository.findById(supplierId)
                 .orElseThrow(() -> new NotFoundException("Supplier Not Found"));
         return supplier;

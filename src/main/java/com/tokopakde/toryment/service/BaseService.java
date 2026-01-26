@@ -1,11 +1,16 @@
 package com.tokopakde.toryment.service;
 
+import com.tokopakde.toryment.dto.ProductQuantityDTO;
+import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.InvalidUUIDException;
+import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.model.BaseModel;
+import com.tokopakde.toryment.pojo.TransactionDetail;
+import com.tokopakde.toryment.repository.ProductRepo;
 
 import java.time.LocalDateTime;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
 
 public class BaseService {
     protected <T extends BaseModel> T prepareCreate(T model) {
@@ -30,7 +35,10 @@ public class BaseService {
         return model;
     }
 
-    protected UUID convertToUUID(String request) {
+    protected UUID parseUUID(String request) {
+        if (request == null) {
+            throw new InvalidUUIDException("Id Is Required");
+        }
         try {
             return UUID.fromString(request);
         } catch (IllegalArgumentException e) {
@@ -47,5 +55,39 @@ public class BaseService {
             result.append(chars.charAt(index));
         }
         return result.toString();
+    }
+
+    protected List<TransactionDetail> prepareDetails(List<ProductQuantityDTO> requests,
+                                                     ProductRepo productRepo) {
+        Map<UUID, Integer> idQuantity = new HashMap<>();
+        for (var dto : requests) {
+            var productId = parseUUID(dto.getProductId());
+            if (idQuantity.containsKey(productId)) {
+                throw new DuplicateException("Duplicate Product");
+            }
+            idQuantity.put(productId, dto.getQuantity());
+        }
+
+        //TODO: lebih bagus compare size => 1 qeuery
+
+        List<TransactionDetail> details = new ArrayList<>();
+        for (Map.Entry<UUID, Integer> entry : idQuantity.entrySet()) {
+            var product = productRepo.findById(entry.getKey())
+                    .orElseThrow(() -> new NotFoundException("Product Not Found"));
+            details.add(new TransactionDetail(product, entry.getValue()));
+        }
+
+        return details;
+    }
+
+    protected <T> void validateUniqueCode(String existingCode,
+                                          String requestCode,
+                                          Function<String, Optional<T>> finder) {
+        if (!existingCode.equals(requestCode)) {
+            finder.apply(requestCode)
+                    .ifPresent(e -> {
+                        throw new DuplicateException("Code Is Not Available");
+                    });
+        }
     }
 }

@@ -6,11 +6,11 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.branch.BranchResDTO;
 import com.tokopakde.toryment.dto.branch.CreateBranchReqDTO;
 import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
-import org.springframework.data.domain.Page;
+import com.tokopakde.toryment.dto.pagination.PageRes;
 import org.springframework.data.domain.Pageable;
 
 public interface BranchService {
-    Page<BranchResDTO> getBranches(Pageable pageable);
+    PageRes<BranchResDTO> getBranches(Pageable pageable);
 
     BranchResDTO getBranchById(String id);
 

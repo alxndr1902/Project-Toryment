@@ -7,10 +7,12 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.branch.BranchResDTO;
 import com.tokopakde.toryment.dto.branch.CreateBranchReqDTO;
 import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
+import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.BranchMapper;
+import com.tokopakde.toryment.mapper.PageMapper;
 import com.tokopakde.toryment.model.company.Branch;
 import com.tokopakde.toryment.repository.BranchRepo;
 import com.tokopakde.toryment.service.BaseService;
@@ -27,10 +29,12 @@ import java.util.UUID;
 public class BranchServiceImpl extends BaseService implements BranchService {
     private final BranchRepo branchRepo;
     private final BranchMapper branchMapper;
+    private final PageMapper pageMapper;
 
     @Override
-    public Page<BranchResDTO> getBranches(Pageable pageable) {
-        return branchRepo.findAllBy(pageable).map(branchMapper::mapToDto);
+    public PageRes<BranchResDTO> getBranches(Pageable pageable) {
+        Page<Branch> branches = branchRepo.findAll(pageable);
+        return pageMapper.toPageResponse(branches, branchMapper::mapToDto);
     }
 
     @Override
@@ -76,8 +80,11 @@ public class BranchServiceImpl extends BaseService implements BranchService {
                     });
         }
 
-        branch = branchMapper.updateEntity(request);
-        var updatedBranch = branchRepo.saveAndFlush(branch);
+        branch.setCode(request.getCode());
+        branch.setName(request.getName());
+        branch.setAddress(request.getAddress());
+        branch.setPhoneNumber(request.getPhoneNumber());
+        var updatedBranch = branchRepo.saveAndFlush(prepareUpdate(branch));
         return new UpdateResDTO(updatedBranch.getVersion(), Message.UPDATED.getDescription());
     }
 
@@ -89,7 +96,7 @@ public class BranchServiceImpl extends BaseService implements BranchService {
     }
 
     private Branch findBranchById(String id) {
-        UUID branchId = convertToUUID(id);
+        UUID branchId = parseUUID(id);
         return branchRepo.findById(branchId)
                 .orElseThrow(() -> new NotFoundException("Branch Not Found"));
     }

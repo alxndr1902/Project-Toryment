@@ -7,10 +7,12 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.category.CategoryResDTO;
 import com.tokopakde.toryment.dto.category.CreateCategoryReqDTO;
 import com.tokopakde.toryment.dto.category.UpdateCategoryReqDTO;
+import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.CategoryMapper;
+import com.tokopakde.toryment.mapper.PageMapper;
 import com.tokopakde.toryment.model.company.Category;
 import com.tokopakde.toryment.repository.CategoryRepo;
 import com.tokopakde.toryment.service.BaseService;
@@ -25,11 +27,12 @@ import org.springframework.stereotype.Service;
 public class CategoryServiceImpl extends BaseService implements CategoryService{
     private final CategoryRepo categoryRepo;
     private final CategoryMapper mapper;
+    private final PageMapper pageMapper;
 
     @Override
-    public Page<CategoryResDTO> getCategories(Pageable pageable) {
+    public PageRes<CategoryResDTO> getCategories(Pageable pageable) {
         Page<Category> categories = categoryRepo.findAllBy(pageable);
-        return categories.map(mapper::mapToDto);
+        return pageMapper.toPageResponse(categories, mapper::mapToDto);
     }
 
     @Override
@@ -52,18 +55,15 @@ public class CategoryServiceImpl extends BaseService implements CategoryService{
     @Override
     public UpdateResDTO updateCategory(String id, UpdateCategoryReqDTO request) {
         var category = findCategoryById(id);
+
         if (!category.getVersion().equals(request.getVersion())) {
             throw new DataIntegrationException("Error Updating Category, Please Refresh The Page");
         }
 
-        if (!request.getCode().equals(category.getCode())) {
-            categoryRepo.findByCode(request.getCode())
-                    .ifPresent(existingCategory -> {
-                        throw new DuplicateException("Code Is Not Available");
-                    });
-        }
+        validateUniqueCode(category.getCode(), request.getCode(), categoryRepo::findByCode);
 
-        category = mapper.updateEntity(request);
+        category.setCode(request.getCode());
+        category.setName(request.getName());
         var updatedCategory = categoryRepo.saveAndFlush(prepareUpdate(category));
         return new UpdateResDTO(updatedCategory.getVersion(), Message.UPDATED.getDescription());
     }
@@ -76,7 +76,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService{
     }
 
     private Category findCategoryById(String id) {
-        var categoryId = convertToUUID(id);
+        var categoryId = parseUUID(id);
         return categoryRepo.findById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category Not Found"));
     }
