@@ -8,8 +8,8 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class SupplierResDTO {
-    private final UUID id;
-    private final String name;
-    private final String phoneNumber;
-    private final Integer version;
+    private UUID id;
+    private String name;
+    private String phoneNumber;
+    private Integer version;
 }

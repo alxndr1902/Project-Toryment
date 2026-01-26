@@ -7,5 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CheckoutDetailResDTO {
     private final String productCode;
+    private final String productName;
     private final Integer quantity;
 }

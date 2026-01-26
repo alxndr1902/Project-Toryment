@@ -9,13 +9,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "checkout_details")
+@Table(name = "checkout_details",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"checkout_id", "product_id"}))
 public class CheckoutDetail extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "checkout_id", nullable = false)
     private Checkout checkout;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 

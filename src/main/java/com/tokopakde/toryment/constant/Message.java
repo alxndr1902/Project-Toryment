@@ -1,17 +1,16 @@
 package com.tokopakde.toryment.constant;
 
+import lombok.Getter;
+
+@Getter
 public enum Message {
     CREATED("Data Created"),
     UPDATED("Data Updated"),
     DELETED("Data Deleted");
 
-    private final String name;
+    private final String description;
 
-    Message(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    Message(String description) {
+        this.description = description;
     }
 }

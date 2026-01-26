@@ -2,14 +2,14 @@ package com.tokopakde.toryment.model.company;
 
 import com.tokopakde.toryment.model.BaseModel;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Email
+@Entity
 @Table(name = "categories")
 public class Category extends BaseModel {
     @Column(nullable = false, unique = true, length = 20)

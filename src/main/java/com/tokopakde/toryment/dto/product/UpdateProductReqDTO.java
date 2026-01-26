@@ -3,7 +3,11 @@ package com.tokopakde.toryment.dto.product;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class UpdateProductReqDTO {
     @NotBlank(message = "Code Is Required")
     @Size(max = 20, message = "Code Maximum Length Is 20 Characters")
