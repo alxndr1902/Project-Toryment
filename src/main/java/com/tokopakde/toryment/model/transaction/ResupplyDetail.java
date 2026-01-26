@@ -9,7 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "resupply_details")
+@Table(name = "resupply_details",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"resupply_id", "product_id"}))
 public class ResupplyDetail extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resupply_id", nullable = false)

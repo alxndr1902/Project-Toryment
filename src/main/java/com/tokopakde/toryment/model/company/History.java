@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Entity
@@ -22,7 +20,4 @@ public class History extends BaseModel {
     @ManyToOne
     @JoinColumn(name = "history_status", nullable = false)
     private HistoryStatus historyStatus;
-
-    @Column(name = "date", nullable = false)
-    private LocalDateTime dateTime;
 }
