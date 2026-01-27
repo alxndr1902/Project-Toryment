@@ -1,6 +1,6 @@
 package com.tokopakde.toryment.service;
 
-import com.tokopakde.toryment.dto.CreateResDTO;
+import com.tokopakde.toryment.dto.CreateTransactionResDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.dto.resupply.CreateResupplyReqDTO;
 import com.tokopakde.toryment.dto.resupply.ResupplyDetailResDTO;
@@ -14,5 +14,5 @@ public interface ResupplyService {
 
     List<ResupplyDetailResDTO> getResupplyById(String id);
 
-    CreateResDTO createResupply(CreateResupplyReqDTO request);
+    CreateTransactionResDTO createResupply(CreateResupplyReqDTO request);
 }

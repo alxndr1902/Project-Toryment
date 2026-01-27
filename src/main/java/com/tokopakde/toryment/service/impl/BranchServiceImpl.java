@@ -8,7 +8,7 @@ import com.tokopakde.toryment.dto.branch.BranchResDTO;
 import com.tokopakde.toryment.dto.branch.CreateBranchReqDTO;
 import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
-import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
+import com.tokopakde.toryment.exceptiohandler.exception.OptimisticLockException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.BranchMapper;
@@ -63,7 +63,7 @@ public class BranchServiceImpl extends BaseService implements BranchService {
         var branch = findBranchById(id);
 
         if (!branch.getVersion().equals(request.getVersion())) {
-            throw new DataIntegrationException("Error Updating Branch, Please Refresh The Page");
+            throw new OptimisticLockException("Error Updating Branch, Please Refresh The Page");
         }
 
         if (!branch.getCode().equals(request.getCode())

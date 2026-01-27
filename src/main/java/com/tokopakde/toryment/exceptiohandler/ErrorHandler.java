@@ -2,9 +2,12 @@ package com.tokopakde.toryment.exceptiohandler;
 
 import com.tokopakde.toryment.dto.ErrorResDTO;
 import com.tokopakde.toryment.exceptiohandler.exception.*;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,8 +23,8 @@ public class ErrorHandler {
         return new ResponseEntity<>(new ErrorResDTO<>(errorMessage), httpStatus);
     }
 
-    @ExceptionHandler(DataIntegrationException.class)
-    public ResponseEntity<?> handleDataIntegrationException(DataIntegrationException e) {
+    @ExceptionHandler(OptimisticLockException.class)
+    public ResponseEntity<?> handleOptimisticLockException(OptimisticLockException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
 
         var message = e.getMessage();
@@ -48,6 +51,38 @@ public class ErrorHandler {
     public ResponseEntity<?> handleDuplicateException(DuplicateException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         var errorMessage = e.getMessage();
+
+        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        var errorMessage = "Method Is Not Found/Request Body Is Not Valid";
+
+        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        HttpStatus httpStatus = HttpStatus.METHOD_NOT_ALLOWED;
+        var errorMessage = e.getMessage();
+
+        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(Exception e) {
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        var errorMessage = "Unknown Error Occurred";
+
+        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException e) {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        var errorMessage = "Invalid Request Parameter";
 
         return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
     }

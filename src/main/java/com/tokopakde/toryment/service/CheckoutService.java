@@ -1,6 +1,6 @@
 package com.tokopakde.toryment.service;
 
-import com.tokopakde.toryment.dto.CreateResDTO;
+import com.tokopakde.toryment.dto.CreateTransactionResDTO;
 import com.tokopakde.toryment.dto.checkout.CheckoutDetailResDTO;
 import com.tokopakde.toryment.dto.checkout.CheckoutResDTO;
 import com.tokopakde.toryment.dto.checkout.CreateCheckoutReqDTO;
@@ -14,5 +14,5 @@ public interface CheckoutService {
 
     List<CheckoutDetailResDTO> getCheckout(String id);
 
-    CreateResDTO createCheckout(CreateCheckoutReqDTO request);
+    CreateTransactionResDTO createCheckout(CreateCheckoutReqDTO request);
 }

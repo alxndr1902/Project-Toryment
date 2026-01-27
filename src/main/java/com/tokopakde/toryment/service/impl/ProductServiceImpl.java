@@ -9,7 +9,7 @@ import com.tokopakde.toryment.dto.product.CreateProductReqDTO;
 import com.tokopakde.toryment.dto.product.ProductResDTO;
 import com.tokopakde.toryment.dto.product.UpdateProductReqDTO;
 import com.tokopakde.toryment.exceptiohandler.exception.ConflictException;
-import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
+import com.tokopakde.toryment.exceptiohandler.exception.OptimisticLockException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.PageMapper;
@@ -36,7 +36,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Override
     public PageRes<ProductResDTO> getProducts(Pageable pageable) {
-        Page<Product> products = productRepo.findAllBy(pageable);
+        Page<Product> products = productRepo.findAll(pageable);
         return pageMapper.toPageResponse(products, productMapper::mapToDto);
     }
 
@@ -57,6 +57,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
                 .orElseThrow(() -> new NotFoundException("Category Is Not Found"));
 
         var product = productMapper.mapToEntity(request);
+        product.setStock(0);
         product.setCategory(category);
 
         var savedProduct = productRepo.save(prepareCreate(product));
@@ -69,7 +70,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
         var product = findProductById(id);
 
         if (!product.getVersion().equals(request.getVersion())) {
-            throw new DataIntegrationException("Error Updating Product, Please Refresh The Page");
+            throw new OptimisticLockException("Error Updating Product, Please Refresh The Page");
         }
 
         if (!product.getCode().equals(request.getCode())

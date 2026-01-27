@@ -30,7 +30,7 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
 
     @Override
     public PageRes<SupplierResDTO> getSuppliers(Pageable pageable) {
-        Page<Supplier> suppliers = supplierRepository.findAllBy(pageable);
+        Page<Supplier> suppliers = supplierRepository.findAll(pageable);
         PageRes<SupplierResDTO> pages = pageMapper.toPageResponse(suppliers, supplierMapper::fromEntity);
         return pages;
     }

@@ -9,7 +9,7 @@ import com.tokopakde.toryment.dto.category.CreateCategoryReqDTO;
 import com.tokopakde.toryment.dto.category.UpdateCategoryReqDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.exceptiohandler.exception.ConflictException;
-import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
+import com.tokopakde.toryment.exceptiohandler.exception.OptimisticLockException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.CategoryMapper;
@@ -34,7 +34,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService{
 
     @Override
     public PageRes<CategoryResDTO> getCategories(Pageable pageable) {
-        Page<Category> categories = categoryRepo.findAllBy(pageable);
+        Page<Category> categories = categoryRepo.findAll(pageable);
         return pageMapper.toPageResponse(categories, mapper::mapToDto);
     }
 
@@ -60,7 +60,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService{
         var category = findCategoryById(id);
 
         if (!category.getVersion().equals(request.getVersion())) {
-            throw new DataIntegrationException("Error Updating Category, Please Refresh The Page");
+            throw new OptimisticLockException("Error Updating Category, Please Refresh The Page");
         }
 
         if (!category.getCode().equals(request.getCode())

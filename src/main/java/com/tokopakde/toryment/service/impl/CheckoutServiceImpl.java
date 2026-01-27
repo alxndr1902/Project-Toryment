@@ -2,8 +2,7 @@ package com.tokopakde.toryment.service.impl;
 
 import com.tokopakde.toryment.constant.HistoryStatusCode;
 import com.tokopakde.toryment.constant.Message;
-import com.tokopakde.toryment.dto.CommonResDTO;
-import com.tokopakde.toryment.dto.CreateResDTO;
+import com.tokopakde.toryment.dto.CreateTransactionResDTO;
 import com.tokopakde.toryment.dto.ProductQuantityDTO;
 import com.tokopakde.toryment.dto.checkout.CheckoutDetailResDTO;
 import com.tokopakde.toryment.dto.checkout.CheckoutResDTO;
@@ -14,10 +13,8 @@ import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.CheckoutMapper;
 import com.tokopakde.toryment.mapper.PageMapper;
 import com.tokopakde.toryment.model.company.History;
-import com.tokopakde.toryment.model.company.Product;
 import com.tokopakde.toryment.model.transaction.Checkout;
 import com.tokopakde.toryment.model.transaction.CheckoutDetail;
-import com.tokopakde.toryment.model.transaction.ResupplyDetail;
 import com.tokopakde.toryment.pojo.TransactionDetail;
 import com.tokopakde.toryment.repository.*;
 import com.tokopakde.toryment.service.BaseService;
@@ -31,9 +28,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -64,7 +58,7 @@ public class CheckoutServiceImpl extends BaseService implements CheckoutService 
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public CreateResDTO createCheckout(CreateCheckoutReqDTO request) {
+    public CreateTransactionResDTO createCheckout(CreateCheckoutReqDTO request) {
         var now = LocalDateTime.now();
 
         var branchId = parseUUID(request.getBranchId());
@@ -87,7 +81,7 @@ public class CheckoutServiceImpl extends BaseService implements CheckoutService 
         updateStock(savedDetails, now);
         createHistory(savedDetails, now);
 
-        return new CreateResDTO(savedCheckout.getId(), Message.CREATED.getDescription());
+        return new CreateTransactionResDTO(savedCheckout.getId(), savedCheckout.getCode(), Message.CREATED.getDescription());
     }
 
     private List<CheckoutDetail> prepareCheckoutDetail(List<ProductQuantityDTO> request,

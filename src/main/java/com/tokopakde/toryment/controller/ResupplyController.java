@@ -1,11 +1,6 @@
 package com.tokopakde.toryment.controller;
 
-import com.tokopakde.toryment.dto.CommonResDTO;
-import com.tokopakde.toryment.dto.CreateResDTO;
-import com.tokopakde.toryment.dto.UpdateResDTO;
-import com.tokopakde.toryment.dto.branch.BranchResDTO;
-import com.tokopakde.toryment.dto.branch.CreateBranchReqDTO;
-import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
+import com.tokopakde.toryment.dto.CreateTransactionResDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.dto.resupply.CreateResupplyReqDTO;
 import com.tokopakde.toryment.dto.resupply.ResupplyDetailResDTO;
@@ -42,7 +37,7 @@ public class ResupplyController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateResDTO> createSupplier(@Valid @RequestBody CreateResupplyReqDTO request) {
+    public ResponseEntity<CreateTransactionResDTO> createSupplier(@Valid @RequestBody CreateResupplyReqDTO request) {
         var response = resupplyService.createResupply(request);
         return new  ResponseEntity<>(response, HttpStatus.CREATED);
     }

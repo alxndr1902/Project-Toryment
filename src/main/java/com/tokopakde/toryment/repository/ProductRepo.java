@@ -15,11 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ProductRepo extends JpaRepository<Product, UUID> {
-    Page<Product> findAllBy(Pageable pageable);
-
     boolean existsByCode(String code);
-
-    Optional<Product> findByCode(String code);
 
     boolean existsByCategory(Category category);
 

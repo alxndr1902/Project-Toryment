@@ -28,7 +28,7 @@ public class HistoryServiceImpl extends BaseService implements HistoryService {
 
     @Override
     public PageRes<HistoryResDTO> getHistories(Pageable pageable) {
-        Page<History> histories = historyRepo.findAllBy(pageable);
+        Page<History> histories = historyRepo.findAll(pageable);
         return pageMapper.toPageResponse(histories, historyMapper::mapToDto);
     }
 

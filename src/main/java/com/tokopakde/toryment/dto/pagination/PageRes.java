@@ -6,8 +6,8 @@ import java.util.List;
 
 @Getter
 public class PageRes<T> {
-    private List<T> data;
-    private PageMeta meta;
+    private final List<T> data;
+    private final PageMeta meta;
 
     public PageRes(List<T> data, PageMeta meta) {
         this.data = data;

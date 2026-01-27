@@ -1,11 +1,10 @@
 package com.tokopakde.toryment.controller;
 
-import com.tokopakde.toryment.dto.CreateResDTO;
+import com.tokopakde.toryment.dto.CreateTransactionResDTO;
 import com.tokopakde.toryment.dto.checkout.CheckoutDetailResDTO;
 import com.tokopakde.toryment.dto.checkout.CheckoutResDTO;
 import com.tokopakde.toryment.dto.checkout.CreateCheckoutReqDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
-import com.tokopakde.toryment.model.transaction.CheckoutDetail;
 import com.tokopakde.toryment.service.CheckoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class CheckoutController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateResDTO> createSupplier(@Valid @RequestBody CreateCheckoutReqDTO request) {
+    public ResponseEntity<CreateTransactionResDTO> createSupplier(@Valid @RequestBody CreateCheckoutReqDTO request) {
         var response = checkoutService.createCheckout(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
