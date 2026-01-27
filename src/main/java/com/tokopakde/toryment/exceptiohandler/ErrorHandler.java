@@ -21,7 +21,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(DataIntegrationException.class)
-    public ResponseEntity<?> handleVersionNotMatchException(DataIntegrationException e) {
+    public ResponseEntity<?> handleDataIntegrationException(DataIntegrationException e) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
 
         var message = e.getMessage();
@@ -52,33 +52,17 @@ public class ErrorHandler {
         return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
     }
 
-    @ExceptionHandler(NotAllowedException.class)
-    public ResponseEntity<?> handleNotAllowedException(NotAllowedException e) {
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        var errorMessage = e.getMessage();
-
-        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<?> handleForbiddenException(ForbiddenException e) {
-        HttpStatus httpStatus = HttpStatus.FORBIDDEN;
-        var errorMessage = e.getMessage();
-
-        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
-    }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<?> handleUnauthorizedException(UnauthorizedException e) {
-        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-        var errorMessage = e.getMessage();
-
-        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
-    }
-
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<?> handleInsufficientStockException(InsufficientStockException e) {
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        var errorMessage = e.getMessage();
+
+        return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<?> handleConflictException(ConflictException e) {
+        HttpStatus httpStatus = HttpStatus.CONFLICT;
         var errorMessage = e.getMessage();
 
         return new ResponseEntity<>(new ErrorResDTO<>(errorMessage),  httpStatus);
