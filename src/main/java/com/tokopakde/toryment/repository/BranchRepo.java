@@ -14,8 +14,4 @@ public interface BranchRepo extends JpaRepository<Branch, UUID> {
     boolean existsByCode(String code);
 
     boolean existsByPhoneNumber(String phoneNumber);
-
-    Optional<Branch> findByCode(String code);
-
-    Optional<Branch> findByPhoneNumber(String phoneNumber);
 }

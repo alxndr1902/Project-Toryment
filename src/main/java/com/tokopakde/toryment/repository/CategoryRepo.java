@@ -12,6 +12,4 @@ public interface CategoryRepo extends JpaRepository<Category, UUID> {
     Page<Category> findAllBy(Pageable pageable);
 
     boolean existsByCode(String code);
-
-    Optional<Category> findByCode(String code);
 }
