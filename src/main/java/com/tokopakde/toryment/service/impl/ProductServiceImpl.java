@@ -8,6 +8,7 @@ import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.dto.product.CreateProductReqDTO;
 import com.tokopakde.toryment.dto.product.ProductResDTO;
 import com.tokopakde.toryment.dto.product.UpdateProductReqDTO;
+import com.tokopakde.toryment.exceptiohandler.exception.ConflictException;
 import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
@@ -15,6 +16,7 @@ import com.tokopakde.toryment.mapper.PageMapper;
 import com.tokopakde.toryment.mapper.ProductMapper;
 import com.tokopakde.toryment.model.company.Product;
 import com.tokopakde.toryment.repository.CategoryRepo;
+import com.tokopakde.toryment.repository.HistoryRepo;
 import com.tokopakde.toryment.repository.ProductRepo;
 import com.tokopakde.toryment.service.BaseService;
 import com.tokopakde.toryment.service.ProductService;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class ProductServiceImpl extends BaseService implements ProductService {
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
+    private final HistoryRepo historyRepo;
     private final ProductMapper productMapper;
     private final PageMapper pageMapper;
 
@@ -46,7 +49,7 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     @Override
     public CreateResDTO createProduct(CreateProductReqDTO request) {
         if (productRepo.existsByCode(request.getCode())) {
-            throw new DuplicateException("Code Is Not Available");
+            throw new DuplicateException("This Code Is Used By Another Product");
         }
 
         var categoryId = parseUUID(request.getCategoryId());
@@ -69,13 +72,9 @@ public class ProductServiceImpl extends BaseService implements ProductService {
             throw new DataIntegrationException("Error Updating Product, Please Refresh The Page");
         }
 
-        validateUniqueCode(product.getCode(), request.getCode(), productRepo::findByCode);
-
-        if (!product.getCode().equals(request.getCode())) {
-            productRepo.findByCode(request.getCode())
-                    .ifPresent( p -> {
-                        throw new DuplicateException("Code Is Not Available");
-                    });
+        if (!product.getCode().equals(request.getCode())
+                && productRepo.existsByCode(request.getCode())) {
+            throw new DuplicateException("This Code Is Used By Another Product");
         }
 
         product.setCode(request.getCode());
@@ -87,6 +86,11 @@ public class ProductServiceImpl extends BaseService implements ProductService {
     @Override
     public CommonResDTO deleteProduct(String id) {
         var product = findProductById(id);
+
+        if (historyRepo.existsByProduct(product)) {
+            throw new ConflictException("Product Cannot Be Deleted, Because The Product Has Transaction Histories");
+        }
+
         productRepo.delete(product);
         return new CommonResDTO(Message.DELETED.getDescription());
     }

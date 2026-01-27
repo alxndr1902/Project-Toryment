@@ -5,6 +5,7 @@ import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.InvalidUUIDException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.model.BaseModel;
+import com.tokopakde.toryment.model.company.Product;
 import com.tokopakde.toryment.pojo.TransactionDetail;
 import com.tokopakde.toryment.repository.ProductRepo;
 
@@ -62,32 +63,31 @@ public class BaseService {
         Map<UUID, Integer> idQuantity = new HashMap<>();
         for (var dto : requests) {
             var productId = parseUUID(dto.getProductId());
+
             if (idQuantity.containsKey(productId)) {
                 throw new DuplicateException("Duplicate Product");
             }
+
             idQuantity.put(productId, dto.getQuantity());
         }
 
-        //TODO: lebih bagus compare size => 1 qeuery
+        List<UUID> productIds = new ArrayList<>(idQuantity.keySet());
 
-        List<TransactionDetail> details = new ArrayList<>();
-        for (Map.Entry<UUID, Integer> entry : idQuantity.entrySet()) {
-            var product = productRepo.findById(entry.getKey())
-                    .orElseThrow(() -> new NotFoundException("Product Not Found"));
-            details.add(new TransactionDetail(product, entry.getValue()));
+        List<Product> products = productRepo.getAllExistingProducts(productIds);
+
+        if (products.size() != productIds.size()) {
+            throw new NotFoundException("Products Are Not Found");
         }
 
-        return details;
-    }
+        List<TransactionDetail> txDetails = products.stream()
+                .map(product -> {
+                    TransactionDetail detail = new TransactionDetail();
+                    detail.setProduct(product);
+                    detail.setQuantity(idQuantity.get(product.getId()));
+                    return detail;
+                })
+                .toList();
 
-    protected <T> void validateUniqueCode(String existingCode,
-                                          String requestCode,
-                                          Function<String, Optional<T>> finder) {
-        if (!existingCode.equals(requestCode)) {
-            finder.apply(requestCode)
-                    .ifPresent(e -> {
-                        throw new DuplicateException("Code Is Not Available");
-                    });
-        }
+        return txDetails;
     }
 }

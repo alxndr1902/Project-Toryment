@@ -51,11 +51,11 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
     @Override
     public CreateResDTO createSupplier(CreateSupplierReqDTO request) {
         if (supplierRepository.existsByName(request.getName())) {
-            throw new DuplicateException("Name Is Not Available");
+            throw new DuplicateException("This Name Is Used By Another Supplier");
         }
 
         if (supplierRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new DuplicateException("Phone Number Is Not Available");
+            throw new DuplicateException("This Phone Number Is Used By Another Supplier");
         }
 
         var supplier = new Supplier();
@@ -72,17 +72,15 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
             throw new DuplicateException("Error Updating Supplier, Please Refresh The Page");
         }
 
-        if (!supplier.getName().equals(request.getName())) {
-            if (supplierRepository.existsByName(request.getName())) {
-                throw new DuplicateException("Name Is Not Available");
-            }
+        if (!supplier.getName().equals(request.getName()) && supplierRepository.existsByName(request.getName())) {
+            throw new DuplicateException("This Name Is Used By Another Supplier");
         }
 
-        if (!supplier.getPhoneNumber().equals(request.getPhoneNumber())) {
-            if (supplierRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-                throw new DuplicateException("Phone Number Is Not Available");
-            }
+        if (!supplier.getPhoneNumber().equals(request.getPhoneNumber())
+                && supplierRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new DuplicateException("This Phone Number Is Used By Another Supplier");
         }
+
         supplier.setName(request.getName());
         supplier.setPhoneNumber(request.getPhoneNumber());
 

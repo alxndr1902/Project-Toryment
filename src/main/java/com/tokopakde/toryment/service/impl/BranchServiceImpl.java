@@ -46,11 +46,11 @@ public class BranchServiceImpl extends BaseService implements BranchService {
     @Override
     public CreateResDTO createBranch(CreateBranchReqDTO request) {
         if (branchRepo.existsByCode(request.getCode())) {
-            throw new DuplicateException("Code Is Not Available");
+            throw new DuplicateException("This Code Is Used By Another Branch");
         }
 
         if (branchRepo.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new DuplicateException("Phone Number Is Not Available");
+            throw new DuplicateException("This Phone Number Is Used By Another Branch");
         }
 
         var branch = branchMapper.mapToEntity(request);
@@ -66,18 +66,14 @@ public class BranchServiceImpl extends BaseService implements BranchService {
             throw new DataIntegrationException("Error Updating Branch, Please Refresh The Page");
         }
 
-        if (!branch.getCode().equals(request.getCode())) {
-            branchRepo.findByCode(request.getCode())
-                    .ifPresent(existingBranch -> {
-                        throw new DuplicateException("Code Is Not Available");
-                    });
+        if (!branch.getCode().equals(request.getCode())
+                && branchRepo.existsByCode(request.getCode())) {
+            throw new DuplicateException("This Code Is Used By Another Branch");
         }
 
-        if (!branch.getPhoneNumber().equals(request.getPhoneNumber())) {
-            branchRepo.findByPhoneNumber(request.getPhoneNumber())
-                    .ifPresent(existingBranch -> {
-                        throw new DuplicateException("Phone Number Is Not Available");
-                    });
+        if (!branch.getPhoneNumber().equals(request.getPhoneNumber())
+                && branchRepo.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new DuplicateException("This Phone Number Is Used By Another Branch");
         }
 
         branch.setCode(request.getCode());
