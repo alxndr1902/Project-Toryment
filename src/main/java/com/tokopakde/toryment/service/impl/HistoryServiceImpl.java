@@ -38,7 +38,7 @@ public class HistoryServiceImpl extends BaseService implements HistoryService {
         var product = productRepo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found"));
 
-        var histories = historyRepo.findAllBYProduct(product);
+        var histories = historyRepo.findAllByProduct(product);
         return histories.stream()
                 .map(historyMapper::mapToDto)
                 .toList();

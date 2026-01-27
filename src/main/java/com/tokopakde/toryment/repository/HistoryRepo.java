@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface HistoryRepo extends JpaRepository<History, UUID> {
     Page<History> findAllBy(Pageable pageable);
 
-    List<History> findAllBYProduct(Product product);
+    List<History> findAllByProduct(Product product);
 
     boolean existsByProduct(Product product);
 }
