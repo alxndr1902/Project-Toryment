@@ -9,22 +9,28 @@ import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.service.BranchService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping("branches")
 public class BranchController {
     private final BranchService branchService;
 
     @GetMapping
-    public ResponseEntity<PageRes<BranchResDTO>> getSuppliers(@RequestParam(defaultValue = "0") Integer page,
-                                                              @RequestParam(defaultValue = "10") Integer size) {
+    public ResponseEntity<PageRes<BranchResDTO>> getSuppliers(@RequestParam(defaultValue = "0") @Min(0) Integer page,
+                                                              @RequestParam(defaultValue = "10") @Min(1) Integer size,
+                                                              @RequestParam(required = false) @Size(max = 100) String branchName,
+                                                              @RequestParam(defaultValue = "id")String sort) {
         Pageable pageable = PageRequest.of(page, size);
         PageRes<BranchResDTO> pages = branchService.getBranches(pageable);
         return new ResponseEntity<>(pages, HttpStatus.OK);

@@ -1,5 +1,6 @@
 package com.tokopakde.toryment.repository;
 
+import com.tokopakde.toryment.model.company.Category;
 import com.tokopakde.toryment.model.company.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,15 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ProductRepo extends JpaRepository<Product, UUID> {
-    Page<Product> findAllBy(Pageable pageable);
-
     boolean existsByCode(String code);
 
-    Optional<Product> findByCode(String code);
+    boolean existsByCategory(Category category);
 
     @Modifying
     @Query("""
@@ -42,4 +42,11 @@ public interface ProductRepo extends JpaRepository<Product, UUID> {
     void checkoutStock(@Param("id") UUID id,
                        @Param("quantity") Integer quantity,
                        @Param("now") LocalDateTime now);
+
+    @Query("""
+    SELECT p
+    FROM Product p
+    WHERE p.id IN :ids
+    """)
+    List<Product> getAllExistingProducts(@Param("ids") List<UUID> ids);
 }

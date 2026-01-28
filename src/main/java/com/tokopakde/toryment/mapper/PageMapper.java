@@ -19,10 +19,7 @@ public class PageMapper {
         PageMeta meta = new PageMeta(
                 page.getNumber(),
                 page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.hasNext(),
-                page.hasPrevious()
+                page.getTotalElements()
         );
 
         return new PageRes<>(data, meta);

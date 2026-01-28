@@ -2,7 +2,7 @@ package com.tokopakde.toryment.service.impl;
 
 import com.tokopakde.toryment.constant.HistoryStatusCode;
 import com.tokopakde.toryment.constant.Message;
-import com.tokopakde.toryment.dto.CreateResDTO;
+import com.tokopakde.toryment.dto.CreateTransactionResDTO;
 import com.tokopakde.toryment.dto.ProductQuantityDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
 import com.tokopakde.toryment.dto.resupply.CreateResupplyReqDTO;
@@ -12,7 +12,6 @@ import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.PageMapper;
 import com.tokopakde.toryment.mapper.ResupplyMapper;
 import com.tokopakde.toryment.model.company.History;
-import com.tokopakde.toryment.model.company.HistoryStatus;
 import com.tokopakde.toryment.model.transaction.Resupply;
 import com.tokopakde.toryment.model.transaction.ResupplyDetail;
 import com.tokopakde.toryment.pojo.TransactionDetail;
@@ -42,7 +41,7 @@ public class ResupplyServiceImpl extends BaseService implements ResupplyService 
 
     @Override
     public PageRes<ResupplyResDTO> getResupplies(Pageable pageable) {
-        var resupplies = resupplyRepo.findAllBy(pageable);
+        var resupplies = resupplyRepo.findAll(pageable);
         return pageMapper.toPageResponse(resupplies, resupplyMapper::mapToDto);
     }
 
@@ -57,7 +56,7 @@ public class ResupplyServiceImpl extends BaseService implements ResupplyService 
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public CreateResDTO createResupply(CreateResupplyReqDTO request) {
+    public CreateTransactionResDTO createResupply(CreateResupplyReqDTO request) {
         LocalDateTime now = LocalDateTime.now();
 
         var supplierId = parseUUID(request.getSupplierId());
@@ -80,7 +79,7 @@ public class ResupplyServiceImpl extends BaseService implements ResupplyService 
         updateStock(savedDetails, now);
         createHistory(savedDetails, now);
 
-        return new CreateResDTO(savedResupply.getId(), Message.CREATED.getDescription());
+        return new CreateTransactionResDTO(savedResupply.getId(), savedResupply.getCode(), Message.CREATED.getDescription());
     }
 
     private List<ResupplyDetail> prepareResupplyDetails(List<ProductQuantityDTO> request,

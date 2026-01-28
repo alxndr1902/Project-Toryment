@@ -8,7 +8,7 @@ import com.tokopakde.toryment.dto.branch.BranchResDTO;
 import com.tokopakde.toryment.dto.branch.CreateBranchReqDTO;
 import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
-import com.tokopakde.toryment.exceptiohandler.exception.DataIntegrationException;
+import com.tokopakde.toryment.exceptiohandler.exception.OptimisticLockException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.BranchMapper;
@@ -46,11 +46,11 @@ public class BranchServiceImpl extends BaseService implements BranchService {
     @Override
     public CreateResDTO createBranch(CreateBranchReqDTO request) {
         if (branchRepo.existsByCode(request.getCode())) {
-            throw new DuplicateException("Code Is Not Available");
+            throw new DuplicateException("This Code Is Used By Another Branch");
         }
 
         if (branchRepo.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new DuplicateException("Phone Number Is Not Available");
+            throw new DuplicateException("This Phone Number Is Used By Another Branch");
         }
 
         var branch = branchMapper.mapToEntity(request);
@@ -63,21 +63,17 @@ public class BranchServiceImpl extends BaseService implements BranchService {
         var branch = findBranchById(id);
 
         if (!branch.getVersion().equals(request.getVersion())) {
-            throw new DataIntegrationException("Error Updating Branch, Please Refresh The Page");
+            throw new OptimisticLockException("Error Updating Branch, Please Refresh The Page");
         }
 
-        if (!branch.getCode().equals(request.getCode())) {
-            branchRepo.findByCode(request.getCode())
-                    .ifPresent(existingBranch -> {
-                        throw new DuplicateException("Code Is Not Available");
-                    });
+        if (!branch.getCode().equals(request.getCode())
+                && branchRepo.existsByCode(request.getCode())) {
+            throw new DuplicateException("This Code Is Used By Another Branch");
         }
 
-        if (!branch.getPhoneNumber().equals(request.getPhoneNumber())) {
-            branchRepo.findByPhoneNumber(request.getPhoneNumber())
-                    .ifPresent(existingBranch -> {
-                        throw new DuplicateException("Phone Number Is Not Available");
-                    });
+        if (!branch.getPhoneNumber().equals(request.getPhoneNumber())
+                && branchRepo.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new DuplicateException("This Phone Number Is Used By Another Branch");
         }
 
         branch.setCode(request.getCode());

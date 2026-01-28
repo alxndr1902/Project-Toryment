@@ -10,23 +10,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("histories")
+@RequestMapping("products")
 public class HistoryController {
     private final HistoryService historyService;
 
-    @GetMapping
-    public ResponseEntity<PageRes<HistoryResDTO>> getSuppliers(@RequestParam(defaultValue = "0") Integer page,
+    @GetMapping("/histories")
+    public ResponseEntity<PageRes<HistoryResDTO>> getHistories(@RequestParam(defaultValue = "0") Integer page,
                                                                @RequestParam(defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         PageRes<HistoryResDTO> pages = historyService.getHistories(pageable);
         return new ResponseEntity<>(pages, HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<HistoryResDTO> getSupplierById(@PathVariable String id) {
-        var response = historyService.getHistoryById(id);
+    @GetMapping("{id}/histories")
+    public ResponseEntity<List<HistoryResDTO>> getHistoriesByProductId(@PathVariable String id) {
+        var response = historyService.getHistoryByProductId(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
