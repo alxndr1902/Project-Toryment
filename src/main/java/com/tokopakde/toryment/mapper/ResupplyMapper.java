@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ResupplyMapper {
+    @Mapping(target = "supplierName", source = "supplier.name")
     ResupplyResDTO mapToDto(Resupply resupply);
 
     @Mapping(target = "productCode", source = "product.code")

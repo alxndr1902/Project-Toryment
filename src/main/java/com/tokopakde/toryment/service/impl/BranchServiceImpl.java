@@ -8,18 +8,19 @@ import com.tokopakde.toryment.dto.branch.BranchResDTO;
 import com.tokopakde.toryment.dto.branch.CreateBranchReqDTO;
 import com.tokopakde.toryment.dto.branch.UpdateBranchReqDTO;
 import com.tokopakde.toryment.dto.pagination.PageRes;
-import com.tokopakde.toryment.exceptiohandler.exception.OptimisticLockException;
-import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
-import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
+import com.tokopakde.toryment.exceptiohandler.exception.*;
 import com.tokopakde.toryment.mapper.BranchMapper;
 import com.tokopakde.toryment.mapper.PageMapper;
 import com.tokopakde.toryment.model.company.Branch;
 import com.tokopakde.toryment.repository.BranchRepo;
+import com.tokopakde.toryment.repository.CheckoutRepo;
 import com.tokopakde.toryment.service.BaseService;
 import com.tokopakde.toryment.service.BranchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -28,12 +29,21 @@ import java.util.UUID;
 @Service
 public class BranchServiceImpl extends BaseService implements BranchService {
     private final BranchRepo branchRepo;
+    private final CheckoutRepo checkoutRepo;
     private final BranchMapper branchMapper;
     private final PageMapper pageMapper;
 
     @Override
-    public PageRes<BranchResDTO> getBranches(Pageable pageable) {
-        Page<Branch> branches = branchRepo.findAll(pageable);
+    public PageRes<BranchResDTO> getBranches(Integer page, Integer size, String branchName,
+                                             String sortBy, boolean ascending) {
+        if (!sortBy.equals("id") && !sortBy.equals("name")) {
+            throw new InvalidSortFieldException("Sort Field Is Not Valid");
+        }
+
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Branch> branches = (branchName == null || branchName.isBlank()) ?
+                branchRepo.findAll(pageable) : branchRepo.findAllWithFilter(branchName, pageable);
         return pageMapper.toPageResponse(branches, branchMapper::mapToDto);
     }
 
@@ -87,6 +97,11 @@ public class BranchServiceImpl extends BaseService implements BranchService {
     @Override
     public CommonResDTO deleteBranch(String id) {
         var branch = findBranchById(id);
+
+        if (checkoutRepo.existsByBranch(branch)) {
+            throw new ConflictException("Branch Cannot Be Deleted, They Have Transaction Record");
+        }
+
         branchRepo.delete(branch);
         return new CommonResDTO(Message.DELETED.getDescription());
     }
