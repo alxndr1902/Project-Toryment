@@ -7,12 +7,14 @@ import com.tokopakde.toryment.dto.UpdateResDTO;
 import com.tokopakde.toryment.dto.supplier.CreateSupplierReqDTO;
 import com.tokopakde.toryment.dto.supplier.SupplierResDTO;
 import com.tokopakde.toryment.dto.supplier.UpdateSupplierReqDTO;
+import com.tokopakde.toryment.exceptiohandler.exception.ConflictException;
 import com.tokopakde.toryment.exceptiohandler.exception.DuplicateException;
 import com.tokopakde.toryment.exceptiohandler.exception.NotFoundException;
 import com.tokopakde.toryment.mapper.SupplierMapper;
 import com.tokopakde.toryment.model.company.Supplier;
 import com.tokopakde.toryment.mapper.PageMapper;
 import com.tokopakde.toryment.dto.pagination.PageRes;
+import com.tokopakde.toryment.repository.ResupplyRepo;
 import com.tokopakde.toryment.repository.SupplierRepo;
 import com.tokopakde.toryment.service.BaseService;
 import com.tokopakde.toryment.service.SupplierService;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SupplierServiceImpl extends BaseService implements SupplierService {
     private final SupplierRepo supplierRepository;
+    private final ResupplyRepo resupplyRepo;
     private final SupplierMapper supplierMapper;
     private final PageMapper pageMapper;
 
@@ -91,6 +94,11 @@ public class SupplierServiceImpl extends BaseService implements SupplierService 
     @Override
     public CommonResDTO deleteSupplier(String id) {
         var supplier =  findSupplierById(id);
+
+        if (resupplyRepo.existsBySupplier(supplier)) {
+            throw new ConflictException("Supplier Cannot Be Deleted, They Have Transaction Record");
+        }
+
         supplierRepository.delete(supplier);
         return new  CommonResDTO(Message.DELETED.getDescription());
     }

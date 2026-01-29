@@ -11,7 +11,6 @@ import com.tokopakde.toryment.repository.ProductRepo;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 
 public class BaseService {
     protected <T extends BaseModel> T prepareCreate(T model) {
@@ -31,13 +30,8 @@ public class BaseService {
         return model;
     }
 
-    protected <T extends BaseModel> T prepareUpdate(T model, LocalDateTime now) {
-        model.setUpdatedAt(now);
-        return model;
-    }
-
     protected UUID parseUUID(String request) {
-        if (request == null) {
+        if (request == null || request.isBlank()) {
             throw new InvalidUUIDException("Id Is Required");
         }
         try {
@@ -73,19 +67,15 @@ public class BaseService {
 
         List<UUID> productIds = new ArrayList<>(idQuantity.keySet());
 
-        List<Product> products = productRepo.getAllExistingProducts(productIds);
+        List<Product> products = productRepo.findAllById(productIds);
 
         if (products.size() != productIds.size()) {
             throw new NotFoundException("Products Are Not Found");
         }
 
         List<TransactionDetail> txDetails = products.stream()
-                .map(product -> {
-                    TransactionDetail detail = new TransactionDetail();
-                    detail.setProduct(product);
-                    detail.setQuantity(idQuantity.get(product.getId()));
-                    return detail;
-                })
+                .map(product -> new TransactionDetail(product,
+                        idQuantity.get(product.getId())))
                 .toList();
 
         return txDetails;

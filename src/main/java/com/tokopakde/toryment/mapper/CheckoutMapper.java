@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CheckoutMapper {
+    @Mapping(target = "branchName", source = "branch.name")
     CheckoutResDTO mapToDto(Checkout checkout);
 
     @Mapping(target = "productCode", source = "product.code")
