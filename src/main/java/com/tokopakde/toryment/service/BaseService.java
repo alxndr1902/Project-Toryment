@@ -67,7 +67,7 @@ public class BaseService {
 
         List<UUID> productIds = new ArrayList<>(idQuantity.keySet());
 
-        List<Product> products = productRepo.findAllById(productIds);
+        List<Product> products = productRepo.getAllExistingProducts(productIds);
 
         if (products.size() != productIds.size()) {
             throw new NotFoundException("Products Are Not Found");

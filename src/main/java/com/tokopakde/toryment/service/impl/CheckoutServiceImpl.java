@@ -86,9 +86,25 @@ public class CheckoutServiceImpl extends BaseService implements CheckoutService 
 
     private List<CheckoutDetail> prepareCheckoutDetail(List<ProductQuantityDTO> request,
                                                        LocalDateTime now) {
-        List<TransactionDetail> transactionDetails = prepareDetails(request, productRepo);
+        List<TransactionDetail> transactionDetails = validateStock(prepareDetails(request, productRepo));
 
         List<CheckoutDetail> details = new ArrayList<>();
+        for (TransactionDetail detail : transactionDetails) {
+            var product = detail.getProduct();
+            var quantity = detail.getQuantity();
+
+            var checkoutDetail = new CheckoutDetail();
+            checkoutDetail.setProduct(product);
+            checkoutDetail.setQuantity(quantity);
+
+            details.add(prepareCreate(checkoutDetail, now));
+        }
+
+        return details;
+    }
+
+    private List<TransactionDetail> validateStock(List<TransactionDetail> transactionDetails) {
+        List<TransactionDetail> details = new ArrayList<>();
         for (TransactionDetail detail : transactionDetails) {
             var product = detail.getProduct();
             var quantity = detail.getQuantity();
@@ -97,12 +113,6 @@ public class CheckoutServiceImpl extends BaseService implements CheckoutService 
                 throw new InsufficientStockException(
                         product.getName() + " Has Insufficient Stock ( " + product.getStock() + " is remaining)");
             }
-
-            var checkoutDetail = new CheckoutDetail();
-            checkoutDetail.setProduct(product);
-            checkoutDetail.setQuantity(quantity);
-
-            details.add(prepareCreate(checkoutDetail, now));
         }
 
         return details;
